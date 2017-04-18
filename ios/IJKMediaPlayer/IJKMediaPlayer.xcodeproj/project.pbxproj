@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		CD257EA61EA650F6000F2A52 /* IJKMediaFramework-Universal */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = CD257EA71EA650F7000F2A52 /* Build configuration list for PBXAggregateTarget "IJKMediaFramework-Universal" */;
+			buildPhases = (
+				CD257EAA1EA6510B000F2A52 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "IJKMediaFramework-Universal";
+			productName = "IJKMediaFramework-Universal";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		5407EC291DF7F93B00457BFE /* IJKVideoToolBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 5407EC271DF7F93B00457BFE /* IJKVideoToolBox.h */; };
 		5407EC2A1DF7F93B00457BFE /* IJKVideoToolBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 5407EC281DF7F93B00457BFE /* IJKVideoToolBox.m */; };
@@ -1092,6 +1106,11 @@
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = bilibili;
 				TargetAttributes = {
+					CD257EA61EA650F6000F2A52 = {
+						CreatedOnToolsVersion = 8.3.1;
+						DevelopmentTeam = 8NNR3SXWL2;
+						ProvisioningStyle = Automatic;
+					};
 					E654EA891B6B27E600B0F2D0 = {
 						CreatedOnToolsVersion = 6.4;
 					};
@@ -1115,6 +1134,7 @@
 				E654EA891B6B27E600B0F2D0 /* IJKMediaFramework */,
 				5450AFC11E63EA4300568494 /* IJKMediaFrameworkWithSSL */,
 				E654EA931B6B27E600B0F2D0 /* IJKMediaFrameworkTests */,
+				CD257EA61EA650F6000F2A52 /* IJKMediaFramework-Universal */,
 			);
 		};
 /* End PBXProject section */
@@ -1171,6 +1191,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "sh \"${PROJECT_DIR}/../../ijkmedia/ijkplayer/version.sh\" \"${PROJECT_DIR}/../../ijkmedia/ijkplayer\" \"ijkversion.h\"";
+		};
+		CD257EAA1EA6510B000F2A52 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/sh\n\nCONFIGURATION=Release\nUNIVERSAL_OUTPUTFOLDER=${BUILD_DIR}/${CONFIGURATION}-universal\nSCHEME_NAME=IJKMediaFramework\n\n# make sure the output directory exists\nmkdir -p \"${UNIVERSAL_OUTPUTFOLDER}/iOS\"\n\n# Step 1. Build Device and Simulator versions on iOS\nxcodebuild -project \"${PROJECT_NAME}.xcodeproj\" -scheme \"${SCHEME_NAME}\" -configuration ${CONFIGURATION} -sdk iphonesimulator clean build\nxcodebuild -project \"${PROJECT_NAME}.xcodeproj\" -scheme \"${SCHEME_NAME}\" -configuration ${CONFIGURATION} -sdk iphoneos clean build\n\n# Step 2. Copy the framework structure (from iphoneos build) to the universal folder\ncp -R \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${SCHEME_NAME}.framework\" \"${UNIVERSAL_OUTPUTFOLDER}/iOS\"\n\n# Step 3. Create universal binary file using lipo and place the combined executable in the copied framework directory\nlipo -create -output \"${UNIVERSAL_OUTPUTFOLDER}/iOS/${SCHEME_NAME}.framework/${SCHEME_NAME}\" \"${BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${SCHEME_NAME}.framework/${SCHEME_NAME}\" \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${SCHEME_NAME}.framework/${SCHEME_NAME}\"\n\n# Step 4. Convenience step to copy the framework to the project's directory\n#mkdir -p \"${TMPDIR}/${SCHEME_NAME}/Frameworks/iOS\"\n\n#cp -R \"${UNIVERSAL_OUTPUTFOLDER}/iOS/${SCHEME_NAME}.framework\" \"${TMPDIR}/${SCHEME_NAME}/Frameworks/iOS\"\ncp -R \"${UNIVERSAL_OUTPUTFOLDER}/iOS/${SCHEME_NAME}.framework\" \"${TMPDIR}\"\n\n# Step 6. Create .tar.gz file for posting on the binary repository\ncd \"${TMPDIR}\"\n\n# We nest the framework inside a Frameworks folder so that it unarchives correctly\ntar -zcf \"${SCHEME_NAME}.framework.tar.gz\" \"${SCHEME_NAME}.framework\"\nmv \"${SCHEME_NAME}.framework.tar.gz\" \"${PROJECT_DIR}/\"\n\n# Step 7. Convenience step to open the project's directory in Finder\nopen \"${PROJECT_DIR}\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1470,9 +1503,26 @@
 			};
 			name = Release;
 		};
+		CD257EA81EA650F7000F2A52 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = 8NNR3SXWL2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		CD257EA91EA650F7000F2A52 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = 8NNR3SXWL2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		E654EA9D1B6B27E600B0F2D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
@@ -1511,6 +1561,7 @@
 				);
 				MACH_O_TYPE = staticlib;
 				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "tv.danmaku.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1523,6 +1574,7 @@
 		E654EA9E1B6B27E600B0F2D0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
@@ -1707,6 +1759,15 @@
 			buildConfigurations = (
 				5450B0411E63EA4300568494 /* Debug */,
 				5450B0421E63EA4300568494 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD257EA71EA650F7000F2A52 /* Build configuration list for PBXAggregateTarget "IJKMediaFramework-Universal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD257EA81EA650F7000F2A52 /* Debug */,
+				CD257EA91EA650F7000F2A52 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
